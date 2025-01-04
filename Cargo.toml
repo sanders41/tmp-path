@@ -9,7 +9,7 @@ homepage = "https://github.com/sanders41/tmp-path"
 repository = "https://github.com/sanders41/tmp-path"
 readme = "README.md"
 keywords = ["testing", "tempdir", "tmpdir", "temppath", "tmppath"]
-categories = ["testing"]
+categories = [ "development-tools" ]
 license = "MIT"
 
 [lib]
