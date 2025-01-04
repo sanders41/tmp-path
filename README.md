@@ -5,7 +5,8 @@ This create contains a macro intended for test purposes that creates a temporary
 
 ## Installation
 
-Note that you also need to install the [tempfile](https://docs.rs/tempfile/latest/tempfile/index.html).
+Note that you also need to install the [tempfile](https://docs.rs/tempfile/latest/tempfile/index.html)
+crate.
 
 ```sh
 cargo add --dev tmp-path tempfile
