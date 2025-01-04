@@ -1,0 +1,21 @@
+[package]
+name = "tmp-path"
+version = "0.1.0"
+edition = "2021"
+authors = ["Paul Sanders <paul@paulsanders.dev>"]
+description = "Test helper to create a temporary directory"
+documentation = "https://github.com/sanders41/tmp-path"
+homepage = "https://github.com/sanders41/tmp-path"
+repository = "https://github.com/sanders41/tmp-path"
+readme = "README.md"
+keywords = ["testing", "tempdir", "tmpdir", "temppath", "tmppath"]
+categories = ["testing"]
+license = "MIT"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = "1.0.38"
+syn = { version = "2.0.94", features = ["full", "proc-macro"] }
+tempfile = "3.15.0"

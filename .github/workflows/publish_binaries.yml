@@ -1,0 +1,18 @@
+on:
+  release:
+    types:
+      - published
+
+name: Publish to creates.io
+
+jobs:
+  cargo-publish:
+    name: Publish to crates.io
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+      - name: Publish
+        run: cargo publish --token ${{ secrets.CARGO_API_TOKEN }}
