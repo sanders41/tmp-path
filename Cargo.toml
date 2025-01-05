@@ -1,6 +1,6 @@
 [package]
 name = "tmp-path"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Paul Sanders <paul@paulsanders.dev>"]
 description = "Test helper to create a temporary directory"
