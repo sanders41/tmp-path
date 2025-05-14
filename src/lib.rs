@@ -14,7 +14,7 @@ pub fn tmp_path(_args: TokenStream, input: TokenStream) -> TokenStream {
     } = input;
     let tmp_path_var = quote! { tmp_path };
     let new_block = quote! {{
-        let mut #tmp_path_var = tempfile::tempdir().unwrap().into_path();
+        let mut #tmp_path_var = tempfile::tempdir().unwrap().keep();
         std::fs::create_dir_all(&#tmp_path_var).unwrap();
 
         #block
