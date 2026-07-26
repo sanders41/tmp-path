@@ -11,6 +11,7 @@ pub fn tmp_path(_args: TokenStream, input: TokenStream) -> TokenStream {
         vis,
         sig,
         block,
+        ..
     } = input;
     let tmp_path_var = quote! { tmp_path };
     let new_block = quote! {{
