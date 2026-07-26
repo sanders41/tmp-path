@@ -2,10 +2,15 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::{parse_macro_input, ItemFn};
 
-/// Creates a temporary directory available to the function as `tmp_path`, a `&Path`.
+/// Creates a temporary directory available to the function as `tmp_path`, a `PathBuf`.
 ///
 /// The directory is created inside the system temporary directory and is removed when the
-/// function returns, including when it panics.
+/// thread that created it finishes, including when it panics. Since the test harness runs each
+/// test on its own thread, the directory lives for the duration of the test, which allows an
+/// annotated helper to return paths to the test that called it.
+///
+/// The directory that gets removed is the one originally created, so reassigning or mutating
+/// `tmp_path` does not affect cleanup.
 #[proc_macro_attribute]
 pub fn tmp_path(_args: TokenStream, input: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input as ItemFn);
@@ -18,15 +23,22 @@ pub fn tmp_path(_args: TokenStream, input: TokenStream) -> TokenStream {
     } = input;
     let tmp_path_var = quote! { tmp_path };
     let new_block = quote! {{
-        struct TmpPathGuard(std::path::PathBuf);
+        struct TmpPathCleanup(Vec<std::path::PathBuf>);
 
-        impl Drop for TmpPathGuard {
+        impl Drop for TmpPathCleanup {
             fn drop(&mut self) {
-                let _ = std::fs::remove_dir_all(&self.0);
+                for path in &self.0 {
+                    let _ = std::fs::remove_dir_all(path);
+                }
             }
         }
 
-        let _tmp_path_guard = TmpPathGuard({
+        std::thread_local! {
+            static TMP_PATH_CLEANUP: std::cell::RefCell<TmpPathCleanup> =
+                std::cell::RefCell::new(TmpPathCleanup(Vec::new()));
+        }
+
+        let mut #tmp_path_var = {
             let base = std::env::temp_dir();
             let nanos = std::time::SystemTime::now()
                 .duration_since(std::time::UNIX_EPOCH)
@@ -57,8 +69,8 @@ pub fn tmp_path(_args: TokenStream, input: TokenStream) -> TokenStream {
                     base.display()
                 ),
             }
-        });
-        let #tmp_path_var = _tmp_path_guard.0.as_path();
+        };
+        TMP_PATH_CLEANUP.with(|cleanup| cleanup.borrow_mut().0.push(#tmp_path_var.clone()));
 
         #block
     }};

@@ -1,10 +1,19 @@
 # tmp-path
 
 This create contains a macro intended for test purposes that creates a temporary directory available
-to the function as `tmp_path`, a `&Path`.
+to the function as `tmp_path`, a `PathBuf`.
 
-The directory is created inside the system temporary directory and is removed when the function
-returns, including when it panics.
+The directory is created inside the system temporary directory and is removed when the thread that
+created it finishes, including when it panics. Because the test harness runs each test on its own
+thread, the directory lives for the duration of the test, so a helper function can create it and
+return paths to the test that called it.
+
+```rs
+#[tmp_path]
+fn mock_config() -> Config {
+    // tmp_path is still valid in the test that calls this
+}
+```
 
 ## Installation
 
